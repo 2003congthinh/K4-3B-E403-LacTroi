@@ -8,10 +8,9 @@
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
+| Trần Quốc Toản | 2A202602984 | thành viên | mining evidence + thống kê Discord — retrieval nguồn chính thức + prompt |
+| Nguyễn Công Thịnh | 2A2026027810 | nhóm trưởng | bot/AI call + fallback khi thiếu căn cứ |
+| Vũ Minh Hiển | 2A202602692 | thành viên | demo/spec — validation user + changelog |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 
