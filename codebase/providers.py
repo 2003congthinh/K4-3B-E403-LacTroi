@@ -44,8 +44,8 @@ PROVIDER_CONFIG = {
     "gemini": {
         "label": "Google Gemini",
         "env": "GEMINI_API_KEY",
-        "models": ["gemini-2.0-flash", "gemini-2.5-flash", "gemini-3.6-flash"],
-        "default_model": "gemini-2.0-flash",
+        "models": ["gemini-3.6-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash", "antigravity", "gemini-3.1-flash-lite"],
+        "default_model": "gemini-3.1-flash-lite",
     },
     "anthropic": {
         "label": "Anthropic Claude",
@@ -157,18 +157,21 @@ def call_llm(
 
     if provider_name == "gemini":
         try:
-            import google.generativeai as genai
+            from google import genai
+            from google.genai import types
         except ImportError as exc:  # pragma: no cover
-            raise RuntimeError("Install google-generativeai: pip install google-generativeai") from exc
+            raise RuntimeError("Install google-genai: pip install google-genai") from exc
 
-        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        model_client = genai.GenerativeModel(model)
+        client = genai.Client(
+            api_key=os.getenv("GEMINI_API_KEY"),
+            http_options=types.HttpOptions(timeout=30000),
+        )
         prompt = "\n".join(f"{msg['role']}: {msg['content']}" for msg in messages)
-        result = model_client.generate_content(prompt)
+        result = client.models.generate_content(model=model, contents=prompt)
         return {
             "provider": provider_name,
             "model": model,
-            "response": result.text,
+            "response": result.text or "",
             "raw": str(result),
         }
 

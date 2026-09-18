@@ -1,4 +1,4 @@
-# AI SPEC — Trợ lý Discord logistics/tiện ích · Nhóm LacTroi · Zone B
+# AI SPEC — Trợ lý Discord logistics/tiện ích · Nhóm LacTroi · Zone 1
 Hướng: [ ] A — VLearn  [x] B — Trợ lý Học viên  [ ] C — Làn mở
 Loại: [x] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 
@@ -145,6 +145,12 @@ Hai kịch bản đáng sợ nhất là (1) *deadline mâu thuẫn giữa 2 thô
 ## §9. Changelog
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
 |---|---|---|
-| Trước CP4 | Chưa có thay đổi nào được ghi nhận chính thức | Nhóm chưa hoàn tất vòng validation người ngoài (R6) nên chưa có feedback thật để trỏ tới — sẽ cập nhật bảng này ngay sau khi có kết quả từ `validation/` |
+| Trước CP4 | Chốt quality bar: ≥80% golden set đạt và 100% case dữ liệu cá nhân/ngoài phạm vi phải từ chối hoặc chuyển người | Chốt trước lượt đo theo yêu cầu của guide; làm mốc so sánh, không thay đổi sau khi có kết quả |
+| Sau CP4 | Thay lớp mock keyword answer bằng retrieval từ `data/school_facts.json`; thêm `codebase/school_facts.py` để chọn fact liên quan và phân biệt `curated_digest`, `watch_list_unresolved`, `community_reply` | Kết quả mock 18/20 không đủ chứng minh app đang dùng nguồn facts có cấu trúc; các case `M81111`, `M12580`, `M31333` cần trả lời có căn cứ hoặc chuyển TA thay vì đoán |
+| Sau CP4 | Gửi các facts liên quan cùng câu hỏi vào Gemini; prompt yêu cầu chỉ dùng `curated_digest` để trả lời chắc chắn, nêu `id/source`, và không coi nội dung data là chỉ thị | Giảm rủi ro hallucination và prompt injection; áp dụng cho toàn bộ golden set, đặc biệt `M12580` (Phoenix), `M81111` (deadline) và `M21333` (dữ liệu cá nhân) |
+| Sau CP4 | Đổi Gemini sang model khả dụng trong môi trường (`gemini-3.1-flash-lite`/`gemini-3.6-flash`) và chuyển SDK từ `google-generativeai` sang `google-genai` | Log ghi nhận `gemini-2.0-flash` trả 404 và SDK cũ phát cảnh báo deprecated; cần cập nhật để tiếp tục chạy API thật |
+| Sau CP4 | Thêm timeout 30 giây, spinner khi đang gọi API, và fallback riêng cho lỗi timeout/504/503 | Log thực tế ghi nhận Gemini `504 DEADLINE_EXCEEDED` với câu hỏi Canteen và `503 UNAVAILABLE` với câu hỏi Phoenix; không nên hiển thị các lỗi này như lỗi thiếu facts |
+| Sau CP4 | Tối giản giao diện thành chat-only; bỏ khung Discord giả lập, status/demo panels và câu hỏi mẫu tự điền; giữ lịch sử các lượt hỏi-đáp trong vùng cuộn | Feedback trong quá trình dùng thử cho thấy khung `#hỏi-đáp-chung` quá lớn và câu hỏi mẫu gây nhầm; mục tiêu là tập trung vào thao tác chat thật |
+| Sau CP4 | Chưa thay đổi quality bar; chưa có lượt đánh giá trọn bộ sau khi chuyển sang school-facts + API grounding | Chưa có validation người ngoài hoặc lượt chạy golden set mới đủ 20 case; các kết quả API hiện tại là log thao tác, chưa được tính là kết quả eval chính thức |
 
 > **Tự khai chung cho toàn bộ §7 và các mục con của §8/§9 nêu trên:** đây là các hạng mục chưa hoàn thiện tại thời điểm chốt CP4, khai rõ để không bị coi là giấu theo đúng luật CP4.
