@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trợ lý Học viên — Bản mẫu tương tác</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#20242C;
+    --ink-soft:#4A5061;
+    --bg:#EDEEF2;
+    --panel:#FFFFFF;
+    --panel-2:#F5F5F8;
+    --rail:#DCDEE6;
+    --border:#D8DAE2;
+    --bubble-user:#E4E6EE;
+    --bubble-bot:#FFFFFF;
+    --grounded:#2E9563;
+    --grounded-bg:#E4F5EC;
+    --caution:#B8770C;
+    --caution-bg:#FBEDD6;
+    --block:#C24A38;
+    --block-bg:#FBE6E2;
+    --human:#3E63C7;
+    --human-bg:#E7ECFB;
+    --accent:#20242C;
+    --trace-bg:#1B1E27;
+    --trace-text:#D8DAE5;
+    --trace-muted:#7E8496;
+    --shadow: 0 1px 2px rgba(20,22,30,.06), 0 8px 24px rgba(20,22,30,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#EAEBF1;
+      --ink-soft:#A6ABBC;
+      --bg:#12141B;
+      --panel:#1A1D26;
+      --panel-2:#20232D;
+      --rail:#262A35;
+      --border:#2B2F3A;
+      --bubble-user:#262A35;
+      --bubble-bot:#1F222B;
+      --grounded:#5FD79A;
+      --grounded-bg:#173226;
+      --caution:#F0B54B;
+      --caution-bg:#3A2C10;
+      --block:#F0806B;
+      --block-bg:#3A1D17;
+      --human:#8CA9F5;
+      --human-bg:#1B2540;
+      --accent:#EAEBF1;
+      --trace-bg:#0D0F14;
+      --trace-text:#C9CCD8;
+      --trace-muted:#6B7185;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#EAEBF1;
+    --ink-soft:#A6ABBC;
+    --bg:#12141B;
+    --panel:#1A1D26;
+    --panel-2:#20232D;
+    --rail:#262A35;
+    --border:#2B2F3A;
+    --bubble-user:#262A35;
+    --bubble-bot:#1F222B;
+    --grounded:#5FD79A;
+    --grounded-bg:#173226;
+    --caution:#F0B54B;
+    --caution-bg:#3A2C10;
+    --block:#F0806B;
+    --block-bg:#3A1D17;
+    --human:#8CA9F5;
+    --human-bg:#1B2540;
+    --accent:#EAEBF1;
+    --trace-bg:#0D0F14;
+    --trace-text:#C9CCD8;
+    --trace-muted:#6B7185;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Be Vietnam Pro", "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  ::selection{background:var(--human-bg);}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 64px;}
+
+  /* ---------- header ---------- */
+  header.top{
+    display:flex;align-items:flex-start;justify-content:space-between;gap:20px;
+    margin-bottom:22px;flex-wrap:wrap;
+  }
+  .brand{display:flex;gap:14px;align-items:flex-start;max-width:640px;}
+  .brand .mark{
+    width:44px;height:44px;border-radius:11px;flex:none;
+    background:linear-gradient(155deg, var(--grounded), var(--human));
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;color:#fff;
+    box-shadow:var(--shadow);
+  }
+  .brand h1{font-size:19px;font-weight:700;margin:2px 0 4px;letter-spacing:-0.01em;}
+  .brand p{margin:0;color:var(--ink-soft);font-size:14px;line-height:1.55;max-width:520px;}
+  .evidence{
+    display:flex;gap:10px;flex-wrap:wrap;
+  }
+  .evidence .stat{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:10px 14px;min-width:118px;box-shadow:var(--shadow);
+  }
+  .evidence .stat b{display:block;font-size:20px;font-weight:700;}
+  .evidence .stat span{font-size:11.5px;color:var(--ink-soft);line-height:1.3;display:block;margin-top:2px;}
+
+  /* ---------- automation legend ---------- */
+  .legend{
+    display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 22px;
+  }
+  .legend .chip{
+    font-size:12px;font-weight:600;padding:6px 11px;border-radius:100px;
+    border:1px solid var(--border);color:var(--ink-soft);background:var(--panel);
+  }
+  .legend .chip b{color:var(--ink);font-weight:700;}
+
+  /* ---------- scenario tabs ---------- */
+  nav.tabs{
+    display:flex;gap:6px;flex-wrap:wrap;
+    padding:5px;background:var(--panel-2);border:1px solid var(--border);
+    border-radius:13px;margin-bottom:18px;
+  }
+  nav.tabs button{
+    appearance:none;border:none;background:transparent;color:var(--ink-soft);
+    font-family:inherit;font-size:13.5px;font-weight:600;
+    padding:10px 14px;border-radius:9px;cursor:pointer;
+    display:flex;align-items:center;gap:8px;
+    transition:background .15s ease, color .15s ease;
+  }
+  nav.tabs button .dot{width:7px;height:7px;border-radius:50%;flex:none;}
+  nav.tabs button:hover{color:var(--ink);}
+  nav.tabs button.active{background:var(--panel);color:var(--ink);box-shadow:var(--shadow);}
+
+  /* ---------- console grid ---------- */
+  .console{
+    display:grid;grid-template-columns:56px minmax(0,1.55fr) minmax(0,1fr);
+    gap:14px;
+  }
+  @media (max-width: 880px){
+    .console{grid-template-columns:1fr;}
+    .rail{display:none;}
+  }
+
+  .rail{
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:10px;
+    box-shadow:var(--shadow);
+  }
+  .rail .ch{
+    width:36px;height:36px;border-radius:11px;background:var(--panel-2);
+    display:flex;align-items:center;justify-content:center;font-size:15px;
+    color:var(--ink-soft);border:1px solid var(--border);
+  }
+  .rail .ch.active{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+
+  .chatpane{
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:520px;
+    overflow:hidden;
+  }
+  .chatpane .chead{
+    padding:14px 18px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .chatpane .chead .name{font-weight:700;font-size:14.5px;}
+  .chatpane .chead .name span{color:var(--ink-soft);font-weight:500;font-size:12.5px;display:block;margin-top:1px;}
+  .status-pill{
+    font-size:11px;font-weight:700;padding:5px 10px;border-radius:100px;
+    display:flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  .status-pill.grounded{color:var(--grounded);background:var(--grounded-bg);}
+  .status-pill.caution{color:var(--caution);background:var(--caution-bg);}
+  .status-pill.block{color:var(--block);background:var(--block-bg);}
+  .status-pill.human{color:var(--human);background:var(--human-bg);}
+
+  .msgs{flex:1;padding:18px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;}
+  .msg{display:flex;gap:10px;max-width:92%;}
+  .msg.out{align-self:flex-start;}
+  .msg .av{
+    width:32px;height:32px;border-radius:50%;flex:none;display:flex;align-items:center;
+    justify-content:center;font-size:14px;font-weight:700;color:#fff;margin-top:2px;
+  }
+  .msg.bot .av{background:linear-gradient(155deg, var(--human), var(--grounded));}
+  .msg.student .av{background:#8A8FA3;}
+  .msg.ta .av{background:var(--human);}
+  .bubble-col{display:flex;flex-direction:column;gap:3px;}
+  .who{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:7px;}
+  .who .tag{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:6px;background:var(--panel-2);color:var(--ink-soft);border:1px solid var(--border);}
+  .bubble{
+    background:var(--bubble-bot);border:1px solid var(--border);
+    padding:10px 13px;border-radius:4px 14px 14px 14px;font-size:14px;line-height:1.55;
+  }
+  .msg.student .bubble{background:var(--bubble-user);}
+  .bubble .src{
+    display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;
+    color:var(--human);font-weight:600;background:var(--human-bg);padding:4px 9px;border-radius:8px;
+  }
+  .bubble .correction-old{color:var(--block);text-decoration:line-through;opacity:.75;}
+  .bubble .correction-new{color:var(--grounded);font-weight:700;}
+  .edited-note{font-size:11.5px;color:var(--human);margin-top:7px;display:flex;align-items:center;gap:5px;font-weight:600;}
+  .fix-btn{
+    margin-top:9px;font-size:12px;font-weight:700;border:1px solid var(--border);
+    background:var(--panel-2);color:var(--ink-soft);padding:6px 10px;border-radius:8px;cursor:pointer;
+    font-family:inherit;
+  }
+  .fix-btn:hover{color:var(--ink);}
+  .typing{display:flex;gap:4px;padding:12px 14px;}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--ink-soft);opacity:.5;animation:blink 1.1s infinite;}
+  .typing span:nth-child(2){animation-delay:.15s;}
+  .typing span:nth-child(3){animation-delay:.3s;}
+  @keyframes blink{0%,60%,100%{opacity:.25;}30%{opacity:.8;}}
+
+  .composer{
+    border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:10px;align-items:center;
+  }
+  .composer .fake-input{
+    flex:1;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;
+    padding:9px 13px;color:var(--ink-soft);font-size:13.5px;
+  }
+  .composer .send{
+    width:34px;height:34px;border-radius:9px;background:var(--panel-2);border:1px solid var(--border);
+    color:var(--ink-soft);flex:none;
+  }
+
+  /* ---------- trace panel ---------- */
+  .tracepane{
+    background:var(--trace-bg);color:var(--trace-text);border-radius:16px;
+    padding:18px;font-family:"IBM Plex Mono", ui-monospace, monospace;
+    box-shadow:var(--shadow);min-height:520px;
+  }
+  .tracepane h3{
+    font-family:"Be Vietnam Pro", sans-serif;font-size:13px;font-weight:700;
+    margin:0 0 14px;color:#fff;display:flex;align-items:center;gap:8px;
+    text-transform:none;
+  }
+  .tracepane h3 .pulse{width:7px;height:7px;border-radius:50%;background:var(--grounded);}
+  .trace-row{margin-bottom:13px;}
+  .trace-row .k{font-size:10.5px;color:var(--trace-muted);margin-bottom:3px;letter-spacing:.01em;}
+  .trace-row .v{font-size:12.5px;line-height:1.55;}
+  .trace-row .v.grounded{color:var(--grounded);}
+  .trace-row .v.caution{color:var(--caution);}
+  .trace-row .v.block{color:var(--block);}
+  .trace-row .v.human{color:var(--human);}
+  .trace-div{height:1px;background:rgba(255,255,255,.08);margin:14px 0;}
+  .hax-card{
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;padding:11px 12px;margin-top:4px;
+  }
+  .hax-card .hid{
+    font-family:"Be Vietnam Pro",sans-serif;font-weight:700;font-size:12px;color:#fff;
+    display:flex;align-items:center;gap:7px;margin-bottom:5px;
+  }
+  .hax-card .hid .badge{
+    font-size:10px;font-weight:700;background:var(--human);color:#0D0F14;padding:1px 7px;border-radius:6px;
+  }
+  .hax-card p{font-family:"Be Vietnam Pro",sans-serif;font-size:12px;line-height:1.55;margin:0;color:var(--trace-text);}
+  .automation-line{
+    font-family:"Be Vietnam Pro",sans-serif;font-size:12px;line-height:1.6;color:var(--trace-text);
+  }
+
+  /* ---------- digest view ---------- */
+  .digest-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media (max-width:700px){.digest-wrap{grid-template-columns:1fr;}}
+  .digest-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:16px 17px;box-shadow:var(--shadow);
+  }
+  .digest-card h4{margin:0 0 4px;font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:7px;}
+  .digest-card h4.bad{color:var(--block);}
+  .digest-card h4.good{color:var(--grounded);}
+  .digest-body{
+    background:var(--panel-2);border:1px solid var(--border);border-radius:10px;
+    padding:12px 13px;font-size:13px;line-height:1.65;margin-top:8px;
+  }
+  .digest-body .broken{background:var(--block-bg);color:var(--block);padding:1px 3px;border-radius:3px;}
+  .digest-body .cut{color:var(--ink-soft);}
+  .digest-foot{font-size:11.5px;color:var(--ink-soft);margin-top:9px;line-height:1.5;}
+
+  footer.note{
+    margin-top:26px;font-size:12px;color:var(--ink-soft);line-height:1.6;
+    border-top:1px solid var(--border);padding-top:16px;
+  }
+  a{color:inherit;}
+
+  .theme-toggle{
+    border:1px solid var(--border);background:var(--panel);color:var(--ink-soft);
+    border-radius:9px;padding:7px 10px;font-size:12px;font-family:inherit;cursor:pointer;
+    display:flex;align-items:center;gap:6px;flex:none;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark">🤖</div>
+      <div>
+        <h1>Trợ lý Học viên — Discord, khoá 4</h1>
+        <p>Bản mẫu tương tác cho 4 đường xử lý của bot: tự tin trả lời có nguồn, nghi ngờ nên hỏi lại, không có căn cứ nên chuyển TA, và cơ chế sửa trực tiếp. Bấm từng thẻ bên dưới để xem bot phản ứng thế nào.</p>
+      </div>
+    </div>
+    <div class="evidence">
+      <div class="stat"><b>21 / 1.092</b><span>tin nhắn là câu hỏi logistics/tiện ích, đếm từ k4_messages.csv</span></div>
+      <div class="stat"><b>6 / 21</b><span>trong số đó không có ai trả lời trong vòng 2 giờ</span></div>
+    </div>
+  </header>
+
+  <div class="legend">
+    <span class="chip"><b>Augment</b> — AI gợi ý, người quyết</span>
+    <span class="chip"><b>Conditional</b> — AI tự làm case chắc, chuyển người case mơ hồ</span>
+    <span class="chip"><b>Automate</b> — AI tự làm, sai rẻ &amp; người dùng tự sửa được</span>
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <div class="console">
+    <div class="rail">
+      <div class="ch active" title="hỏi-đáp-chung">#</div>
+      <div class="ch" title="thông-báo">📌</div>
+      <div class="ch" title="ta-mod">🎓</div>
+      <div class="ch" title="bản-tin-ngày">🗞️</div>
+    </div>
+
+    <div class="chatpane">
+      <div class="chead">
+        <div class="name" id="chanName">#hỏi-đáp-chung <span id="chanSub">Trợ lý trả lời khi được @tag</span></div>
+        <div class="status-pill grounded" id="statusPill">● có căn cứ</div>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="composer">
+        <div class="fake-input" id="composerHint">Nhắn @Trợ lý để hỏi bài, hỏi deadline, hỏi thủ tục…</div>
+        <div class="send">➤</div>
+      </div>
+    </div>
+
+    <div class="tracepane" id="tracepane">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <footer class="note">
+    Dữ liệu minh hoạ dựng lại từ <code>data/discord-pack/</code> (1.092 tin, 12–14/09 khoá 4, đã ẩn danh). Mã tin tham chiếu ví dụ: M19124, M45903, M40677, M89624. Mức tự động hoá và nguyên tắc HAX/PAIR áp cho từng đường được liệt kê trong bảng §4b của <code>spec.md</code>.
+  </footer>
+</div>
+
+<script>
+const scenarios = [
+  {
+    id:'happy', label:'Trả lời có căn cứ', dotColor:'var(--grounded)',
+    channel:'#hỏi-đáp-chung', channelSub:'Trợ lý trả lời khi được @tag',
+    pill:{cls:'grounded', text:'● có căn cứ'},
+    messages:[
+      {who:'student', name:'Lan Anh', tag:'học viên mới', text:'Cho em hỏi hạn nộp lab 2 là khi nào ạ?'},
+      {who:'bot', name:'Trợ lý', tag:'bot', typingMs:900,
+        html:'Hạn nộp <b>Lab 2</b>: 23:59, 20/09 (giờ VN).<span class="src">📌 Thông báo #12 — Deadline Lab 2</span>'}
+    ],
+    trace:[
+      {k:'Ý định nhận diện', v:'Hỏi logistics — deadline', cls:''},
+      {k:'Nguồn tìm được', v:'1 nguồn chính thức, không mâu thuẫn (Thông báo #12)', cls:'grounded'},
+      {k:'Độ tin cậy', v:'Cao — khớp đúng từ khoá + đúng 1 nguồn', cls:'grounded'},
+      {k:'Hành động', v:'Trả lời ngắn, kèm trích dẫn nguồn để học viên tự đối chiếu', cls:''},
+    ],
+    automation:'<b>Conditional.</b> Bot tự trả lời vì có đúng một căn cứ chính thức. Sai thì rẻ: nguồn được trích kèm ngay trong câu trả lời nên học viên đối chiếu được tức thì.',
+    hax:{id:'G11', name:'Giải thích vì sao (Make clear why)', body:'Mọi câu trả lời logistics luôn kèm tên và link thông báo gốc, không trả lời "chay".'}
+  },
+  {
+    id:'low', label:'Nghi ngờ — hỏi lại', dotColor:'var(--caution)',
+    channel:'#hỏi-đáp-chung', channelSub:'Trợ lý trả lời khi được @tag',
+    pill:{cls:'caution', text:'● 2 nguồn mâu thuẫn'},
+    messages:[
+      {who:'student', name:'Minh Quân', tag:'học viên', text:'Deadline nộp báo cáo cuối kỳ là ngày nào vậy ạ?'},
+      {who:'bot', name:'Trợ lý', tag:'bot', typingMs:1100,
+        html:'Em ơi mình thấy có 2 thông tin khác nhau: <span class="src">📌 Thông báo #4 → 25/09</span> <span class="src">📌 Thông báo #9 → 27/09</span><br>Mình chưa dám chốt giúp em, đã tag TA xác nhận rồi ạ 🙏 <span class="who"><span class="tag">@TA-Toản</span></span>'}
+    ],
+    trace:[
+      {k:'Ý định nhận diện', v:'Hỏi logistics — deadline', cls:''},
+      {k:'Nguồn tìm được', v:'2 thông báo, giá trị khác nhau (#4 và #9)', cls:'caution'},
+      {k:'Độ tin cậy', v:'Thấp — xung đột nguồn, không chọn đại một bên', cls:'caution'},
+      {k:'Hành động', v:'Không đoán · thu hẹp phạm vi trả lời · tag TA để chốt', cls:'human'},
+    ],
+    automation:'<b>Conditional → chuyển người.</b> Đa số case một nguồn thì an toàn để bot tự trả lời, nhưng khi 2 nguồn lệch nhau, sai sẽ khiến học viên nộp trễ thật — nên chuyển cho người quyết.',
+    hax:{id:'G10', name:'Thu hẹp phạm vi khi nghi ngờ (Scope services when in doubt) — bắt buộc', body:'Bot nêu rõ đang thấy gì mâu thuẫn thay vì chọn đại một mốc, rồi thu hẹp vai trò về việc tag đúng người xử lý.'}
+  },
+  {
+    id:'block', label:'Không có căn cứ', dotColor:'var(--block)',
+    channel:'#hỏi-đáp-chung', channelSub:'Trợ lý trả lời khi được @tag',
+    pill:{cls:'block', text:'● không có quyền trả lời'},
+    messages:[
+      {who:'student', name:'Bảo Trâm', tag:'học viên', text:'Điểm danh hôm qua của em có bị thiếu không ạ, em sợ bị trừ điểm 😢'},
+      {who:'bot', name:'Trợ lý', tag:'bot', typingMs:800,
+        html:'Đây là thông tin điểm danh cá nhân nên mình không tra được ạ. Mình đã tag TA phụ trách điểm danh giúp em rồi nha <span class="who"><span class="tag">@TA-Hiển</span></span>, em đợi chút xíu nhé!'}
+    ],
+    trace:[
+      {k:'Ý định nhận diện', v:'Câu hỏi cá nhân — trạng thái điểm danh', cls:''},
+      {k:'Nguồn tìm được', v:'Không áp dụng — dữ liệu cá nhân, bot không có quyền truy cập', cls:'block'},
+      {k:'Độ tin cậy', v:'Biết-mình-không-biết — không suy đoán thay dữ liệu thật', cls:'block'},
+      {k:'Hành động', v:'Từ chối trả lời, không đoán · chuyển thẳng cho TA phụ trách', cls:'human'},
+    ],
+    automation:'<b>Augment.</b> Sai ở đây là đắt: nếu bot đoán nhầm việc điểm danh, học viên có thể yên tâm sai hoặc lo lắng oan. Người quyết, bot chỉ nêu tình huống.',
+    hax:{id:'G8', name:'Gạt bỏ dễ dàng (Support efficient dismissal)', body:'Bot tự nhận ngay không có thẩm quyền và chuyển việc trong một bước, học viên không phải tranh luận qua lại với bot.'}
+  },
+  {
+    id:'fix', label:'Sửa câu trả lời', dotColor:'var(--human)',
+    channel:'#hỏi-đáp-chung', channelSub:'Trợ lý trả lời khi được @tag',
+    pill:{cls:'human', text:'● đã được TA sửa'},
+    messages:[
+      {who:'student', name:'Đăng Khoa', tag:'học viên', text:'Hạn nộp lab 3 là bao giờ ạ?'},
+      {who:'bot', name:'Trợ lý', tag:'bot', typingMs:700,
+        html:'Hạn nộp <b>Lab 3</b>: 23:59, 18/09.<span class="src">📌 Thông báo #2 — Deadline Lab 3</span>',
+        fixable:true,
+        fixedHtml:'Hạn nộp <b>Lab 3</b>: <span class="correction-old">23:59, 18/09</span> → <span class="correction-new">23:59, 21/09</span><span class="src">📌 Thông báo #15 — Gia hạn Lab 3 (thay thế #2)</span><div class="edited-note">✏️ Đã sửa bởi TA Thịnh · 21:40 · lý do: thông báo #2 đã bị thông báo #15 thay thế</div>'}
+    ],
+    trace:[
+      {k:'Vì sao cần sửa', v:'Bot trích thông báo #2, nhưng #15 đã thay thế nó — bot lấy nguồn cũ vì #15 đăng muộn hơn lần index gần nhất', cls:'block'},
+      {k:'Ai sửa', v:'TA Thịnh — sửa trực tiếp ngay trong tin nhắn của bot', cls:'human'},
+      {k:'Sau khi sửa', v:'Tin cập nhật công khai, giữ lại giá trị cũ có gạch ngang để đối chiếu', cls:'grounded'},
+      {k:'Log', v:'Ghi nhận: nguồn cũ → nguồn mới, người sửa, thời điểm', cls:''},
+    ],
+    automation:'<b>Automate có người giám sát.</b> Bot tự cập nhật lại chỉ mục nguồn sau khi được sửa một lần — sai từng xảy ra nhưng sửa rẻ và học viên thấy ngay đâu là đúng.',
+    hax:{id:'G9', name:'Sửa dễ dàng (Support efficient correction)', body:'TA bấm "Sửa câu trả lời" ngay trong luồng chat, không cần rời Discord sang một hệ thống quản trị riêng.'}
+  },
+];
+
+const tabs = document.getElementById('tabs');
+scenarios.forEach((s,i)=>{
+  const b = document.createElement('button');
+  b.dataset.i = i;
+  b.innerHTML = `<span class="dot" style="background:${s.dotColor}"></span>${s.label}`;
+  b.addEventListener('click', ()=> render(i));
+  tabs.appendChild(b);
+});
+// digest tab appended separately (not part of scenario data model, custom render)
+const digestBtn = document.createElement('button');
+digestBtn.innerHTML = `<span class="dot" style="background:var(--human)"></span>Bản tin ngày`;
+digestBtn.addEventListener('click', renderDigest);
+tabs.appendChild(digestBtn);
+
+const msgsEl = document.getElementById('msgs');
+const traceEl = document.getElementById('tracepane');
+const chanName = document.getElementById('chanName');
+const chanSub = document.getElementById('chanSub');
+const statusPill = document.getElementById('statusPill');
+const composerHint = document.getElementById('composerHint');
+
+function setActiveTab(idx, isDigest){
+  [...tabs.children].forEach((c,i)=> c.classList.toggle('active', isDigest ? i===tabs.children.length-1 : i===idx));
+}
+
+function avatarLetter(name){ return name.charAt(0); }
+
+function renderTrace(s){
+  let rows = s.trace.map(t=>`
+    <div class="trace-row">
+      <div class="k">${t.k}</div>
+      <div class="v ${t.cls}">${t.v}</div>
+    </div>`).join('');
+  traceEl.innerHTML = `
+    <h3><span class="pulse"></span>Vì sao bot làm vậy</h3>
+    ${rows}
+    <div class="trace-div"></div>
+    <div class="trace-row">
+      <div class="k">Mức tự động hoá</div>
+      <div class="automation-line">${s.automation}</div>
+    </div>
+    <div class="trace-div"></div>
+    <div class="hax-card">
+      <div class="hid"><span class="badge">${s.hax.id}</span>${s.hax.name}</div>
+      <p>${s.hax.body}</p>
+    </div>
+  `;
+}
+
+function render(idx){
+  const s = scenarios[idx];
+  setActiveTab(idx,false);
+  chanName.childNodes[0].nodeValue = s.channel + ' ';
+  chanSub.textContent = s.channelSub;
+  statusPill.className = 'status-pill ' + s.pill.cls;
+  statusPill.textContent = s.pill.text;
+  composerHint.textContent = 'Nhắn @Trợ lý để hỏi bài, hỏi deadline, hỏi thủ tục…';
+  msgsEl.innerHTML = '';
+  renderTrace(s);
+
+  let delay = 150;
+  s.messages.forEach((m)=>{
+    setTimeout(()=> appendMessage(m), delay);
+    delay += (m.typingMs || 500) + 250;
+  });
+}
+
+function appendMessage(m){
+  if(m.typingMs){
+    const t = document.createElement('div');
+    t.className = 'msg bot';
+    t.innerHTML = `<div class="av">🤖</div><div class="bubble-col"><div class="typing"><span></span><span></span><span></span></div></div>`;
+    msgsEl.appendChild(t);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    setTimeout(()=>{ t.remove(); pushBubble(m); }, m.typingMs);
+  } else {
+    pushBubble(m);
+  }
+}
+
+function pushBubble(m){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + m.who;
+  const av = document.createElement('div');
+  av.className = 'av';
+  av.textContent = m.who === 'bot' ? '🤖' : avatarLetter(m.name);
+  const col = document.createElement('div');
+  col.className = 'bubble-col';
+  const who = document.createElement('div');
+  who.className = 'who';
+  who.innerHTML = `${m.name} <span class="tag">${m.tag}</span>`;
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.innerHTML = m.html || m.text;
+  col.appendChild(who); col.appendChild(bub);
+
+  if(m.fixable){
+    const btn = document.createElement('button');
+    btn.className = 'fix-btn';
+    btn.textContent = '✏️ Sửa câu trả lời (vai TA)';
+    btn.addEventListener('click', ()=>{
+      bub.innerHTML = m.fixedHtml;
+      btn.remove();
+      statusPill.className = 'status-pill human';
+      statusPill.textContent = '● đã được TA sửa';
+    });
+    col.appendChild(btn);
+  }
+
+  wrap.appendChild(av); wrap.appendChild(col);
+  msgsEl.appendChild(wrap);
+  msgsEl.scrollTop = msgsEl.scrollHeight;
+}
+
+function renderDigest(){
+  setActiveTab(0,true);
+  chanName.childNodes[0].nodeValue = '#bản-tin-ngày ';
+  chanSub.textContent = 'Bot tự tổng hợp "học viên đang hỏi gì" mỗi tối';
+  statusPill.className = 'status-pill human';
+  statusPill.textContent = '● tự động, 21:00 hằng ngày';
+  composerHint.textContent = 'Bản tin này do bot tự đăng, TA/Mod không cần gõ gì';
+  msgsEl.innerHTML = `
+    <div class="digest-wrap" style="grid-column:1/-1;width:100%">
+      <div class="digest-card">
+        <h4 class="bad">⚠️ Bản tin đang chạy thật (còn lỗi)</h4>
+        <div class="digest-body">
+          Hôm nay có 7 câu hỏi về deadline. Học viên hay <span class="broken">hỏi vềđ</span>ề bài lab 2 và cách nộp<span class="cut">…</span>
+        </div>
+        <div class="digest-foot">Lỗi thật quan sát được: chuỗi "nguồn tham chiếu" bị chèn vào giữa một từ ("vềđ|ề bài"), và câu tóm tắt bị cắt cụt giữa chừng.</div>
+      </div>
+      <div class="digest-card">
+        <h4 class="good">✓ Sau khi sửa luồng ghép nguồn</h4>
+        <div class="digest-body">
+          Hôm nay có 7 câu hỏi về deadline, chủ yếu hỏi về đề bài Lab 2 và cách nộp bài. 6/21 câu hỏi tuần này chưa có ai trả lời trong 2 giờ.
+        </div>
+        <div class="digest-foot">Sửa bằng cách chèn trích dẫn nguồn sau khi câu đã hoàn chỉnh, và giới hạn tóm tắt theo câu chứ không theo số ký tự cố định.</div>
+      </div>
+    </div>
+  `;
+  traceEl.innerHTML = `
+    <h3><span class="pulse"></span>Vì sao bản tin làm vậy</h3>
+    <div class="trace-row"><div class="k">Nguồn dữ liệu</div><div class="v">Toàn bộ tin trong ngày ở các kênh public</div></div>
+    <div class="trace-row"><div class="k">Cách chọn chủ đề nóng</div><div class="v">Gom câu hỏi theo từ khoá lặp lại + số tin không có reply</div></div>
+    <div class="trace-row"><div class="k">Lỗi đã ghi nhận</div><div class="v caution">Ghép nguồn giữa từ · tóm tắt cắt cụt (xem 2 thẻ bên trái)</div></div>
+    <div class="trace-div"></div>
+    <div class="trace-row">
+      <div class="k">Mức tự động hoá</div>
+      <div class="automation-line"><b>Automate.</b> Đây là tổng hợp công khai, không phải quyết định ảnh hưởng điểm số — sai thì TA thấy ngay và bot sửa ở lần chạy sau, chi phí sai thấp.</div>
+    </div>
+    <div class="trace-div"></div>
+    <div class="hax-card">
+      <div class="hid"><span class="badge">G11</span>Giải thích vì sao (Make clear why)</div>
+      <p>Bản tin luôn kèm cách đếm ("6/21 câu chưa có ai trả lời") thay vì chỉ nói "nhiều học viên đang hỏi".</p>
+    </div>
+  `;
+}
+
+render(0);
+</script>
+</body>
+</html>

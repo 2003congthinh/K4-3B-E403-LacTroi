@@ -40,19 +40,39 @@ Loại: [ ] Tối ưu tính năng có sẵn  [ ] Tính năng mới
 - [Sản phẩm 2]: ...
 
 ## §4. Thiết kế
-- Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả):
+- Lát cắt MỘT CÂU (1 user · 1 việc · 1 quyết định AI · 1 kết quả): Học viên mới hỏi trong Discord về thông tin logistics/tiện ích khóa học (deadline, nộp bài, tài liệu, wifi, thẻ, thư viện, gửi xe) · bot tìm trong thông báo chính thức, trả lời có dẫn nguồn nếu có căn cứ, hoặc chuyển TA khi thiếu căn cứ · kết quả là học viên nhận được câu trả lời rõ ràng trong cùng luồng chat mà không phải dò tin nhắn cũ hoặc hỏi lại nhiều lần.
 - Non-goals (≥3 thứ KHÔNG build):
-- Mức prototype nhắm tới: [ ] Sketch [ ] Mock [ ] Working — phần nào mock, phần nào thật:
-- Automation: [ ] augment [ ] conditional [ ] automate — lý do theo cost-of-error:
+  - Không tự động quyết định deadline hoặc thay thế quyền của quản lý/TA.
+  - Không truy cập dữ liệu cá nhân như điểm danh, hồ sơ học viên, hoặc thông tin riêng tư.
+  - Không chạy một hệ thống AI sản xuất hoàn chỉnh hay tích hợp real-time với Discord; đây không phải bot live cho khóa.
+  - Không tự động tạo lịch hoặc event; chỉ hỗ trợ tra cứu và gợi ý nguồn chính thức.
+- Mức prototype nhắm tới: [ ] Sketch [ ] Mock [x] Working — phần nào mock, phần nào thật:
+  - Chạy thật: giao diện Discord demo, chuyển tab giữa 4 đường xử lý, trạng thái “có căn cứ / nghi ngờ / không thể trả lời / đã được TA sửa”, và các tương tác click trong file HTML prototype.
+  - Chạy giả lập: loại câu hỏi, logic chọn nguồn, mức độ tự động hóa, phản hồi bot, và dữ liệu “mô phỏng” từ CSV/Discord mẫu; không có retrieval từ hệ thống thực tế và không có AI live inference.
+  - Kết luận: đây là một prototype “Working” ở mức interactive demo, nhưng logic điều phối và phản hồi là mô phỏng để chứng minh trải nghiệm, không phải phiên bản production.
+- Automation: [ ] augment [x] conditional [ ] automate — lý do theo cost-of-error:
+  - Bot chỉ tự trả lời khi có một nguồn chính thức rõ ràng (case “có căn cứ”).
+  - Khi có xung đột nguồn hoặc không đủ căn cứ, bot chuyển cho người phụ trách, thay vì đoán. Đây là lựa chọn phù hợp vì cost-of-error của trả lời sai về deadline/quy định rất cao.
+  - Mức conditional là hợp lý nhất cho mô hình này: thực hiện tự động hóa ở những trường hợp an toàn, còn yếu tố rủi ro được giữ ở người quyết.
 - §4b. Nguyên tắc đã áp dụng (≥4 — HAX/PAIR, xem guide):
   | Nguyên tắc | Áp cụ thể vào đâu trong prototype |
   |---|---|
+  | Make clear why (G11) | Mỗi phản hồi có phần "📌 Thông báo #..." và ghi rõ nguồn để học viên biết vì sao bot trả lời như vậy. |
+  | Scope services when in doubt (G10) | Khi phát hiện 2 nguồn mâu thuẫn hoặc thiếu nguồn, bot không đoán mà chuyển sang lãnh vực TA / yêu cầu xác nhận. |
+  | Support efficient correction (G9) | Có flow “TA sửa câu trả lời” ngay trong chat, kèm gạch ngang câu cũ và chèn câu mới với lý do. |
+  | Support efficient dismissal (G8) | Nếu không có thẩm quyền hoặc không có dữ liệu, bot nói rõ “mình không có quyền / không có căn cứ” và chuyển đúng người xử lý. |
+  | Show uncertainty, not fake certainty | Trong mockup, các status pill như “2 nguồn mâu thuẫn” hoặc “không có quyền trả lời” làm rõ mức độ tin cậy, thay vì trả lời chắc chắn sai. |
+  | Keep human in the loop | Mỗi case có thể chuyển đến TA; prototype cho thấy người quyết định luôn ở cuối luồng. |
 
 ## §5. Kiểu lỗi — 4 lớp chỗ khó + kịch bản (≥8) [bảng theo guide §2.5]
 
 ## §6. Bốn đường đi của trải nghiệm
-- Happy path: · Low-confidence (②): · Failure/không căn cứ (①): · Correction (user sửa):
-- Khi bị đòi ngoài phạm vi (③): · Case đặc thù domain (④):
+- Happy path: Học viên hỏi về deadline hoặc thông tin logistics có sẵn trong tài liệu chính thức; bot tìm đúng nguồn, trả lời ngắn gọn, kèm trích dẫn nguồn, và học viên nhận được câu trả lời ngay trong kênh Discord mà không cần rời chat. Đây là trường hợp có căn cứ rõ ràng và mức tin cậy cao.
+- Low-confidence (②): Học viên hỏi về mốc thời hạn nhưng bot thấy 2 thông báo mâu thuẫn; bot không đoán, nêu rõ hai nguồn cùng tồn tại và tag TA để xác nhận trước khi trả lời. Luồng này hiển thị rõ nguyên tắc tránh sai thông tin có hại.
+- Failure/không căn cứ (①): Học viên hỏi về điểm danh cá nhân, hồ sơ hoặc thông tin không thuộc phạm vi tool; bot trả lời rằng không có quyền / không có dữ liệu để xác minh và chuyển cho TA phụ trách. Đây là case “không cho bot đoán”.
+- Correction (user sửa): Bot trả lời dựa trên nguồn cũ, nhưng sau đó TA phát hiện thông báo mới đã thay thế nguồn cũ; bot/TA sửa trực tiếp vào câu trả lời cũ, giữ bản cũ gạch ngang để minh hoạ thay đổi. Đây là flow xử lý lỗi có thể sửa nhanh và không làm mất lịch sử.
+- Khi bị đòi ngoài phạm vi (③): Nếu người dùng hỏi việc ngoài scope như “điểm danh”, “đánh giá cá nhân”, “câu hỏi ngoài khóa”, bot từ chối rõ ràng và chuyển người phù hợp. Đây là cách bảo vệ độ tin cậy và tránh chạm vào phạm vi nhạy cảm.
+- Case đặc thù domain (④): Các câu hỏi có nhiều mốc thời gian hoặc thông tin lan tỏa qua nhiều bài đăng, dẫn tới nhiều nguồn không đồng nhất; bot tái xác định là “case mơ hồ”, yêu cầu TA xác nhận thay vì trả lời sai. Prototype dùng trạng thái “2 nguồn mâu thuẫn” để thể hiện điều đó.
 
 ## §7. Kiểm thử
 - Chiều chất lượng + định nghĩa kiểm chứng được:
